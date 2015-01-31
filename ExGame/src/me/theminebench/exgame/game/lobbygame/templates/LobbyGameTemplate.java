@@ -1,18 +1,9 @@
 package me.theminebench.exgame.game.lobbygame.templates;
 
-import java.util.UUID;
-
-import me.theminebench.exgame.game.lobbygame.LobbyGameCreater.GameState;
+import me.theminebench.exgame.game.lobbygame.events.LobbyListener;
 
 import org.bukkit.event.Listener;
 
-public interface LobbyGameTemplate extends Listener {
+public interface LobbyGameTemplate extends Listener, LobbyListener {
 	
-	public void gameStateChange(GameState oldGameState, GameState newGameState);
-	
-	public boolean canJoin(UUID playersUUID);
-	
-	public void playerJoin(UUID playersUUID);
-	
-	public void playerQuit(UUID playersUUID);
 }

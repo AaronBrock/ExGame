@@ -3,15 +3,19 @@ package me.theminebench.exgame.game.lobbygame.game.spleef;
 import java.util.UUID;
 
 import me.theminebench.exgame.ExGame;
-import me.theminebench.exgame.game.lobbygame.LobbyGameCreater.GameState;
+import me.theminebench.exgame.game.lobbygame.LobbyGameManager.GameState;
+import me.theminebench.exgame.game.lobbygame.events.LobbyEventHandler;
+import me.theminebench.exgame.game.lobbygame.events.defaultEvents.GameStateChangeEvent;
+import me.theminebench.exgame.game.lobbygame.events.defaultEvents.PlayerQuitArenaEvent;
 import me.theminebench.exgame.game.lobbygame.templates.LobbyGameTemplate;
 import me.theminebench.exgame.game.lobbygame.templates.spectate.SpectateManager;
-import me.theminebench.exgame.game.lobbygame.templates.worldcreation.WorldMannager;
+import me.theminebench.exgame.game.lobbygame.templates.worldcreation.WorldCreateEvent;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_8_R1.entity.CraftPlayer;
 import org.bukkit.entity.Arrow;
@@ -19,7 +23,6 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
-import org.bukkit.entity.Wolf;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
@@ -39,12 +42,12 @@ public class SpleefTemplate implements LobbyGameTemplate {
 	
 	private SpectateManager spectateManager;
 	
-	private WorldMannager worldMannager;
+	private World gameWorld;
 	
-	public SpleefTemplate(SpleefGame spleefGame, SpectateManager spectateManager, WorldMannager worldMannager) {
+	public SpleefTemplate(SpleefGame spleefGame, SpectateManager spectateManager) {
 		this.spleefGame = spleefGame;
 		this.spectateManager = spectateManager;
-		this.worldMannager = worldMannager;
+		spleefGame.getLobbyGameManager().registerLobbyListener(this);
 	}
 	
 	public SpectateManager getSpectateManager() {
@@ -55,34 +58,25 @@ public class SpleefTemplate implements LobbyGameTemplate {
 		return spleefGame;
 	}
 	
-	@Override
-	public void gameStateChange(GameState oldGameState, GameState newGameState) {
+	@LobbyEventHandler
+	public void createWorld(WorldCreateEvent e) {
+		this.gameWorld = e.getWorld();
+	}
+	
+	@LobbyEventHandler
+	public void gameStateChange(GameStateChangeEvent e) {
 		
-		if (newGameState.equals(GameState.PRE_GAME)) {
-			for (UUID u : getSpleefGame().getLobbyGameCreater().getArena().getPlayers()) {
-				getSpleefGame().getDefaultSpawnTemplate().sendPlayerToSpawn(u);
-			}
-		}
-		
-		if (newGameState.equals(GameState.IN_GAME)) {
+		if (e.getCurrentGameState().equals(GameState.IN_GAME)) {
 			Bukkit.getPluginManager().registerEvents(this, ExGame.getPlugin());
-		} else if(oldGameState.equals(GameState.IN_GAME)) {
+		} else if(e.getOldGameState().equals(GameState.IN_GAME)) {
 			HandlerList.unregisterAll(this);
+		} else if (e.getCurrentGameState().equals(GameState.RESTARTING)) {
+			getSpleefGame().getLobbyGameManager().unregisterLobbyListener(this);
 		}
 	}
 
-	@Override
-	public boolean canJoin(UUID playersUUID) {
-		return true;
-	}
-
-	@Override
-	public void playerJoin(UUID playersUUID) {
-		
-	}
-
-	@Override
-	public void playerQuit(UUID playersUUID) {
+	@LobbyEventHandler
+	public void playerQuit(PlayerQuitArenaEvent e) {
 		getSpleefGame().checkGameEnd();
 	}
 	
@@ -106,7 +100,7 @@ public class SpleefTemplate implements LobbyGameTemplate {
 		
 		if (block.getType().equals(Material.TNT)) {
 			
-			TNTPrimed tnt = (TNTPrimed) worldMannager.getGameWorld().spawnEntity(block.getLocation().add(0.5, 0.5, 0.5), EntityType.PRIMED_TNT);
+			TNTPrimed tnt = (TNTPrimed) getGameWorld().spawnEntity(block.getLocation().add(0.5, 0.5, 0.5), EntityType.PRIMED_TNT);
 			
 			tnt.setFuseTicks(30);
 			
@@ -175,7 +169,7 @@ public class SpleefTemplate implements LobbyGameTemplate {
 	public void onEntityExplode(EntityExplodeEvent e){
 		if (e.isCancelled())
 			return;
-		if (!e.getLocation().getWorld().getName().equals(worldMannager.getGameWorld().getName()))
+		if (!e.getLocation().getWorld().getName().equals(getGameWorld().getName()))
 			return;
 		
 		e.setCancelled(true);
@@ -191,7 +185,7 @@ public class SpleefTemplate implements LobbyGameTemplate {
 			}
 			if (block.getType().equals(Material.TNT)) {
 				block.setType(Material.AIR);
-				TNTPrimed tnt = (TNTPrimed) worldMannager.getGameWorld().spawnEntity(block.getLocation().add(0.5, 0.5, 0.5), EntityType.PRIMED_TNT);
+				TNTPrimed tnt = (TNTPrimed) getGameWorld().spawnEntity(block.getLocation().add(0.5, 0.5, 0.5), EntityType.PRIMED_TNT);
 				
 				tnt.setFuseTicks(5);
 				
@@ -203,7 +197,7 @@ public class SpleefTemplate implements LobbyGameTemplate {
 		
 		final double amount = 4;
 		
-		for (UUID u : getSpleefGame().getLobbyGameCreater().getArena().getPlayers()) {
+		for (UUID u : getSpleefGame().getLobbyGameManager().getArena().getPlayers()) {
 			
 			Player p = Bukkit.getPlayer(u);
 			
@@ -264,7 +258,7 @@ public class SpleefTemplate implements LobbyGameTemplate {
 		
 		Location loc = arrow.getLocation();
 		
-		TNTPrimed tnt = (TNTPrimed) worldMannager.getGameWorld().spawnEntity(loc.add(0.5, 0.5, 0.5), EntityType.PRIMED_TNT);
+		TNTPrimed tnt = (TNTPrimed) getGameWorld().spawnEntity(loc.add(0.5, 0.5, 0.5), EntityType.PRIMED_TNT);
 		
 		loc.getWorld().createExplosion(loc, 0.5f);
 		
@@ -276,5 +270,9 @@ public class SpleefTemplate implements LobbyGameTemplate {
 	public boolean hasPlayer(UUID playersUUID) {
 		return getSpectateManager().getPlayers().contains(playersUUID);
 	}
-
+	
+	public World getGameWorld() {
+		return gameWorld;
+	}
+	
 }

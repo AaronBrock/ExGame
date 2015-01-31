@@ -6,7 +6,7 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.scoreboard.Scoreboard;
 
-import me.theminebench.exgame.game.lobbygame.LobbyGameCreater.GameState;
+import me.theminebench.exgame.game.lobbygame.LobbyGameManager.GameState;
 import me.theminebench.exgame.game.lobbygame.templates.LobbyGameTemplate;
 
 public class ScoreboardManager implements LobbyGameTemplate {

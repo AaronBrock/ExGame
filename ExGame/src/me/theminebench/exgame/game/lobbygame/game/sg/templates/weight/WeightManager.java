@@ -3,7 +3,7 @@ package me.theminebench.exgame.game.lobbygame.game.sg.templates.weight;
 import java.util.UUID;
 
 import me.theminebench.exgame.ExGame;
-import me.theminebench.exgame.game.lobbygame.LobbyGameCreater.GameState;
+import me.theminebench.exgame.game.lobbygame.LobbyGameManager.GameState;
 import me.theminebench.exgame.game.lobbygame.game.LobbyGame;
 import me.theminebench.exgame.game.lobbygame.game.sg.templates.weight.weightlisteners.WeightListeners;
 import me.theminebench.exgame.game.lobbygame.templates.LobbyGameTemplate;
@@ -116,7 +116,7 @@ public class WeightManager implements LobbyGameTemplate{
 	@Override
 	public void gameStateChange(GameState oldGameState, GameState newGameState) {
 		if (newGameState.equals(GameState.IN_GAME)) {
-			for (UUID u : lobbyGame.getLobbyGameCreater().getArena().getPlayers())
+			for (UUID u : lobbyGame.getLobbyGameManager().getArena().getPlayers())
 				updateWeight(u);
 			Bukkit.getPluginManager().registerEvents(getWeightListeners(), ExGame.getPlugin());
 		} else

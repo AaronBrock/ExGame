@@ -3,7 +3,9 @@ package me.theminebench.exgame.game.lobbygame.templates.gamedefaults;
 import java.util.UUID;
 
 import me.theminebench.exgame.ExGame;
-import me.theminebench.exgame.game.lobbygame.LobbyGameCreater.GameState;
+import me.theminebench.exgame.game.lobbygame.LobbyGameManager.GameState;
+import me.theminebench.exgame.game.lobbygame.events.LobbyEventHandler;
+import me.theminebench.exgame.game.lobbygame.events.defaultEvents.GameStateChangeEvent;
 import me.theminebench.exgame.game.lobbygame.game.LobbyGame;
 import me.theminebench.exgame.game.lobbygame.templates.LobbyGameTemplate;
 
@@ -25,26 +27,20 @@ public class DefaultPreGameTemplate implements LobbyGameTemplate {
 	
 	public DefaultPreGameTemplate(LobbyGame lobbyGame) {
 		this.lobbyGame = lobbyGame;
+		lobbyGame.getLobbyGameManager().registerLobbyListener(this);
 	}
 	
-	@Override
-	public void gameStateChange(GameState oldGameState, GameState newGameState) {
-		if (newGameState.equals(GameState.PRE_GAME)) {
+	@LobbyEventHandler
+	public void gameStateChange(GameStateChangeEvent e) {
+
+		if (e.getCurrentGameState().equals(GameState.PRE_GAME)) {
 			Bukkit.getPluginManager().registerEvents(this, ExGame.getPlugin());
-		} else if(oldGameState.equals(GameState.PRE_GAME)) {
+		} else if(e.getOldGameState().equals(GameState.PRE_GAME)) {
 			HandlerList.unregisterAll(this);
+		} if (e.getCurrentGameState().equals(GameState.RESTARTING)) {
+			lobbyGame.getLobbyGameManager().unregisterLobbyListener(this);
 		}
 	}
-
-	@Override
-	public boolean canJoin(UUID playersUUID) {return true;}
-
-	@Override
-	public void playerJoin(UUID playersUUID) {}
-
-	@Override
-	public void playerQuit(UUID playersUUID) {}
-	
 
 	@EventHandler
 	public void onEntityDamage(EntityDamageEvent e) {
@@ -95,7 +91,7 @@ public class DefaultPreGameTemplate implements LobbyGameTemplate {
 	}
 	
 	private boolean hasPlayer(UUID u) {
-		return lobbyGame.getLobbyGameCreater().getArena().getPlayers().contains(u);
+		return lobbyGame.getLobbyGameManager().getArena().getPlayers().contains(u);
 	}
 	
 	

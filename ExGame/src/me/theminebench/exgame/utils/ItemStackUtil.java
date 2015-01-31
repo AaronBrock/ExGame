@@ -1,7 +1,11 @@
 package me.theminebench.exgame.utils;
 
+import java.util.UUID;
+
 import org.apache.commons.lang3.ArrayUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -31,9 +35,13 @@ public class ItemStackUtil {
 					count += i.getMaxStackSize();
 				else if (is.isSimilar(i))
 					count += i.getMaxStackSize() - is.getAmount();
-
 		}
 		return count;
+	}
+	
+	public static void clearInv(UUID playersUUID) {
+		Player p = Bukkit.getPlayer(playersUUID);
+		p.getInventory().clear();
 	}
 	
 	public static boolean isArmor(Material material) {

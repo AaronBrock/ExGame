@@ -7,7 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemStack;
 
-import me.theminebench.exgame.game.lobbygame.LobbyGameCreater.GameState;
+import me.theminebench.exgame.game.lobbygame.LobbyGameManager.GameState;
 import me.theminebench.exgame.game.lobbygame.game.LobbyGame;
 import me.theminebench.exgame.game.lobbygame.game.sg.templates.weight.WeightItemDataManager;
 import me.theminebench.exgame.game.lobbygame.game.sg.templates.weight.WeightPlayerDataManager;
@@ -42,8 +42,8 @@ public class SGDataManager implements LobbyGameTemplate, WeightPlayerDataManager
 	
 	@Override
 	public void gameStateChange(GameState oldGameState, GameState newGameState) {
-		if (getLobbyGame().getLobbyGameCreater().getGameState().equals(GameState.IN_LOBBY)) {
-			for (UUID u : getLobbyGame().getLobbyGameCreater().getArena().getPlayers()) {
+		if (getLobbyGame().getLobbyGameManager().getGameState().equals(GameState.IN_LOBBY)) {
+			for (UUID u : getLobbyGame().getLobbyGameManager().getArena().getPlayers()) {
 				getPlayerDatas().put(u, new PlayerData(u));
 			}
 		}

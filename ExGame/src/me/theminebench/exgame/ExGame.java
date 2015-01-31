@@ -1,10 +1,11 @@
 package me.theminebench.exgame;
 
-import me.theminebench.exgame.game.lobbygame.LobbyGameCreater;
+import me.theminebench.exgame.game.lobbygame.LobbyGameManager;
 import me.theminebench.exgame.game.lobbygame.LobbyGameFactory;
 import me.theminebench.exgame.game.lobbygame.game.LobbyGame;
 import me.theminebench.exgame.game.lobbygame.game.sg.SGgame;
 import me.theminebench.exgame.game.lobbygame.game.spleef.SpleefGame;
+import me.theminebench.exgame.game.lobbygame.game.testgame.TestGame;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -40,7 +41,7 @@ public class ExGame extends JavaPlugin implements Listener {
 	public void onEnable() {
 		setPlugin(this);
 		
-		this.arena = new Arena(new LobbyGameCreater(new LobbyGameFactory() {
+		this.arena = new Arena(new LobbyGameManager(new LobbyGameFactory() {
 			
 			@Override
 			public LobbyGame getLobbyGame() {

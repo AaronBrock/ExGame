@@ -1,11 +1,14 @@
 package me.theminebench.exgame.game.lobbygame.templates.countdowns;
 
-import java.util.UUID;
-
 import me.theminebench.exgame.UpdateListener;
 import me.theminebench.exgame.Updater;
-import me.theminebench.exgame.game.lobbygame.LobbyGameCreater;
-import me.theminebench.exgame.game.lobbygame.LobbyGameCreater.GameState;
+import me.theminebench.exgame.game.lobbygame.LobbyGameManager;
+import me.theminebench.exgame.game.lobbygame.LobbyGameManager.GameState;
+import me.theminebench.exgame.game.lobbygame.events.LobbyEventHandler;
+import me.theminebench.exgame.game.lobbygame.events.defaultEvents.GameStateChangeEvent;
+import me.theminebench.exgame.game.lobbygame.events.defaultEvents.PlayerCanJoinArenaEvent;
+import me.theminebench.exgame.game.lobbygame.events.defaultEvents.PlayerJoinArenaEvent;
+import me.theminebench.exgame.game.lobbygame.events.defaultEvents.PlayerQuitArenaEvent;
 import me.theminebench.exgame.game.lobbygame.templates.LobbyGameTemplate;
 
 public class LobbyCountdown implements LobbyGameTemplate, UpdateListener {
@@ -13,43 +16,48 @@ public class LobbyCountdown implements LobbyGameTemplate, UpdateListener {
 	private int minPlayers;
 	private int maxPlayers;
 	
-	private LobbyGameCreater lobbyGameCreater;
+	private LobbyGameManager lobbyGameCreater;
 	
 	// TODO get default time from config
 	public final int DEFAULTTIME = 20;
 	
 	private int timeUntilStart;
 	
-	public LobbyCountdown(LobbyGameCreater lobbyGameCreater, int minPlayers, int maxPlayers) {
+	public LobbyCountdown(LobbyGameManager lobbyGameCreater, int minPlayers, int maxPlayers) {
 		this.lobbyGameCreater = lobbyGameCreater;
 		
 		this.minPlayers = minPlayers;
 		this.maxPlayers = maxPlayers;
+		getLobbyGameCreater().registerLobbyListener(this);
 	}
 	
-	@Override
-	public void gameStateChange(GameState oldGameState, GameState newGameState) {
-		if (newGameState.equals(GameState.IN_LOBBY)) {
+	
+	@LobbyEventHandler
+	public void gameStateChange(GameStateChangeEvent e) {
+		if (e.getCurrentGameState().equals(GameState.IN_LOBBY)) {
 			if (getLobbyGameCreater().getArena().getPlayers().size() >= getMinPlayers())
-				start();
-			else
-				stop();
-		} else
+				checkCountdown();
+		} else {
 			stop();
+			if (e.getCurrentGameState().equals(GameState.RESTARTING)) {
+				getLobbyGameCreater().unregisterLobbyListener(this);
+			}
+		}
+			
 	}
-
-	@Override
-	public boolean canJoin(UUID playersUUID) {
+	
+	@LobbyEventHandler
+	public boolean canJoin(PlayerCanJoinArenaEvent e) {
 		return !(getLobbyGameCreater().getArena().getPlayers().size() + 1 >= getMaxPlayers());
 	}
 
-	@Override
-	public void playerJoin(UUID playersUUID) {
+	@LobbyEventHandler
+	public void playerJoin(PlayerJoinArenaEvent e) {
 		checkCountdown();
 	}
 	
-	@Override
-	public void playerQuit(UUID playersUUID) {
+	@LobbyEventHandler
+	public void playerQuit(PlayerQuitArenaEvent e) {
 		checkCountdown();
 	}
 	
@@ -106,7 +114,7 @@ public class LobbyCountdown implements LobbyGameTemplate, UpdateListener {
 		this.timeUntilStart = timeUntilStart;
 	}
 	
-	public LobbyGameCreater getLobbyGameCreater() {
+	public LobbyGameManager getLobbyGameCreater() {
 		return lobbyGameCreater;
 	}
 	public int getMinPlayers() {

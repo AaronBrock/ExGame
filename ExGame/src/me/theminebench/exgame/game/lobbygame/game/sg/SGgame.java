@@ -1,6 +1,6 @@
 package me.theminebench.exgame.game.lobbygame.game.sg;
 
-import me.theminebench.exgame.game.lobbygame.LobbyGameCreater;
+import me.theminebench.exgame.game.lobbygame.LobbyGameManager;
 import me.theminebench.exgame.game.lobbygame.game.LobbyGame;
 import me.theminebench.exgame.game.lobbygame.game.sg.templates.SGDataManager;
 import me.theminebench.exgame.game.lobbygame.game.sg.templates.chests.ChestsTemplate;
@@ -15,15 +15,15 @@ import me.theminebench.exgame.game.lobbygame.templates.spectate.SpectateManager;
 
 public class SGgame implements LobbyGame {
 	
-	private LobbyGameCreater lobbyGameCreater;
+	private LobbyGameManager lobbyGameCreater;
 	
 	@Override
-	public void setLobbyGameCreater(LobbyGameCreater lobbyGameCreater) {
+	public void setLobbyGameManager(LobbyGameManager lobbyGameCreater) {
 		this.lobbyGameCreater = lobbyGameCreater;
 	}
 
 	@Override
-	public LobbyGameCreater getLobbyGameCreater() {
+	public LobbyGameManager getLobbyGameManager() {
 		return this.lobbyGameCreater;
 	}
 

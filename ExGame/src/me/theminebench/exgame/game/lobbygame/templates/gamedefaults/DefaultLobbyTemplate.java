@@ -3,11 +3,16 @@ package me.theminebench.exgame.game.lobbygame.templates.gamedefaults;
 import java.util.UUID;
 
 import me.theminebench.exgame.ExGame;
-import me.theminebench.exgame.game.lobbygame.LobbyGameCreater.GameState;
+import me.theminebench.exgame.game.lobbygame.LobbyGameManager.GameState;
+import me.theminebench.exgame.game.lobbygame.events.LobbyEventHandler;
+import me.theminebench.exgame.game.lobbygame.events.defaultEvents.GameStateChangeEvent;
+import me.theminebench.exgame.game.lobbygame.events.defaultEvents.PlayerJoinArenaEvent;
 import me.theminebench.exgame.game.lobbygame.game.LobbyGame;
 import me.theminebench.exgame.game.lobbygame.templates.LobbyGameTemplate;
+import me.theminebench.exgame.utils.PlayerUtil;
 
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -30,26 +35,32 @@ public class DefaultLobbyTemplate implements LobbyGameTemplate {
 	
 	public DefaultLobbyTemplate(LobbyGame lobbyGame) {
 		this.lobbyGame = lobbyGame;
+		lobbyGame.getLobbyGameManager().registerLobbyListener(this);
 	}
 	
-	@Override
-	public void gameStateChange(GameState oldGameState, GameState newGameState) {
-		if (newGameState.equals(GameState.IN_LOBBY)) {
+	@LobbyEventHandler
+	public void gameStateChange(GameStateChangeEvent e) {
+		if (e.getCurrentGameState().equals(GameState.IN_LOBBY)) {
 			Bukkit.getPluginManager().registerEvents(this, ExGame.getPlugin());
-		} else if(oldGameState.equals(GameState.IN_LOBBY)) {
+			for (UUID playersUUID : lobbyGame.getLobbyGameManager().getArena().getPlayers()) {
+				sendPlayerToLobby(playersUUID);
+			}
+		} else if(e.getOldGameState().equals(GameState.IN_LOBBY)) {
 			HandlerList.unregisterAll(this);
+		} else if (e.getCurrentGameState().equals(GameState.RESTARTING)) {
+			lobbyGame.getLobbyGameManager().unregisterLobbyListener(this);
 		}
 	}
-
-	@Override
-	public boolean canJoin(UUID playersUUID) {return true;}
-
-	@Override
-	public void playerJoin(UUID playersUUID) {}
-
-	@Override
-	public void playerQuit(UUID playersUUID) {}
 	
+	@LobbyEventHandler
+	public void onJoin(PlayerJoinArenaEvent e) {
+		if (lobbyGame.getLobbyGameManager().getGameState().equals(GameState.IN_LOBBY)) {
+			sendPlayerToLobby(e.getPlayersUUID());
+		}
+			
+	}
+
+
 	@EventHandler
 	public void onMoveEvent(PlayerMoveEvent e) {
 		Player p = e.getPlayer();
@@ -164,12 +175,23 @@ public class DefaultLobbyTemplate implements LobbyGameTemplate {
 		}
 	}
 	
+	public void sendPlayerToLobby(UUID playersUUID) {
+		Player p = Bukkit.getPlayer(playersUUID);
+		p.setFallDistance(0);
+		p.setFireTicks(0);
+		PlayerUtil.resetMaxHealth(playersUUID);
+		PlayerUtil.resetMaxHunger(playersUUID);
+		PlayerUtil.clearInv(playersUUID);
+		p.setGameMode(GameMode.ADVENTURE);
+		p.teleport(getLobbyWorld().getSpawnLocation());
+	}
+	
 	private boolean hasPlayer(UUID u) {
-		return lobbyGame.getLobbyGameCreater().getArena().getPlayers().contains(u);
+		return lobbyGame.getLobbyGameManager().getArena().getPlayers().contains(u);
 	}
 	
 	public World getLobbyWorld() {
-		return lobbyGame.getLobbyGameCreater().getLobbyWorld();
+		return lobbyGame.getLobbyGameManager().getLobbyWorld();
 	}
 	
 	

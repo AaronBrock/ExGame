@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.UUID;
 
 import me.theminebench.exgame.ExGame;
-import me.theminebench.exgame.game.lobbygame.LobbyGameCreater.GameState;
+import me.theminebench.exgame.game.lobbygame.LobbyGameManager.GameState;
 import me.theminebench.exgame.game.lobbygame.game.LobbyGame;
 import me.theminebench.exgame.game.lobbygame.game.sg.templates.chests.data.ChestData;
 import me.theminebench.exgame.game.lobbygame.templates.LobbyGameTemplate;
@@ -37,7 +37,7 @@ public class ChestsTemplate implements LobbyGameTemplate {
 	public void gameStateChange(GameState oldGameState, GameState newGameState) {
 		if (newGameState.equals(GameState.IN_LOBBY)) {
 			
-			YamlConfiguration mapdata = getLobbyGame().getLobbyGameCreater().getMapData();
+			YamlConfiguration mapdata = getLobbyGame().getLobbyGameManager().getMapData();
 			
 			if (mapdata.getConfigurationSection("chests") != null) {
 				ConfigurationSection chests = mapdata.getConfigurationSection("chests");
@@ -51,7 +51,7 @@ public class ChestsTemplate implements LobbyGameTemplate {
 					ExGame.getPlugin().getLogger().warning(chests.getString(key));
 					
 					for (String s : chests.getStringList(key)) {
-						Location l = LocationUtils.toLocation(getLobbyGame().getLobbyGameCreater().getGameWorldName(), s);
+						Location l = LocationUtils.toLocation(getLobbyGame().getLobbyGameManager().getGameWorldName(), s);
 						ExGame.getPlugin().getLogger().warning("s = " + s);
 						if (l == null)
 							continue;

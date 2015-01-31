@@ -1,44 +1,36 @@
 package me.theminebench.exgame.game.lobbygame.templates.countdowns;
 
-import java.util.UUID;
-
 import me.theminebench.exgame.UpdateListener;
 import me.theminebench.exgame.Updater;
-import me.theminebench.exgame.game.lobbygame.LobbyGameCreater;
-import me.theminebench.exgame.game.lobbygame.LobbyGameCreater.GameState;
+import me.theminebench.exgame.game.lobbygame.LobbyGameManager;
+import me.theminebench.exgame.game.lobbygame.LobbyGameManager.GameState;
+import me.theminebench.exgame.game.lobbygame.events.LobbyEventHandler;
+import me.theminebench.exgame.game.lobbygame.events.defaultEvents.GameStateChangeEvent;
 import me.theminebench.exgame.game.lobbygame.templates.LobbyGameTemplate;
 
 public class PostGameCountdown implements LobbyGameTemplate, UpdateListener {
 	
-	private LobbyGameCreater lobbyGameCreater;
+	private LobbyGameManager lobbyGameCreater;
 	// TODO get default time from config
 	public final int DEFAULTTIME = 5;
 	
 	private int timeUntilStart;
 	
-	public PostGameCountdown(LobbyGameCreater lobbyGameCreater) {
+	public PostGameCountdown(LobbyGameManager lobbyGameCreater) {
 		this.lobbyGameCreater = lobbyGameCreater;
+		getLobbyGameCreater().registerLobbyListener(this);
 	}
 	
-	@Override
-	public void gameStateChange(GameState oldGameState, GameState newGameState) {
-		if (newGameState.equals(GameState.POST_GAME)) {
+	@LobbyEventHandler
+	public void gameStateChange(GameStateChangeEvent e) {
+		if (e.getCurrentGameState().equals(GameState.POST_GAME)) {
 			start();
-		} else
+		} else {
 			stop();
-	}
-
-	@Override
-	public boolean canJoin(UUID playersUUID) {
-		return true;
-	}
-
-	@Override
-	public void playerJoin(UUID playersUUID) {
-	}
-	
-	@Override
-	public void playerQuit(UUID playersUUID) {
+			if (e.getCurrentGameState().equals(GameState.RESTARTING)) {
+				getLobbyGameCreater().unregisterLobbyListener(this);
+			}
+		}
 	}
 	
 	
@@ -86,7 +78,7 @@ public class PostGameCountdown implements LobbyGameTemplate, UpdateListener {
 		this.timeUntilStart = timeUntilStart;
 	}
 	
-	public LobbyGameCreater getLobbyGameCreater() {
+	public LobbyGameManager getLobbyGameCreater() {
 		return lobbyGameCreater;
 	}
 	
