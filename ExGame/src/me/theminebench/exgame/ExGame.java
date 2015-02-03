@@ -1,11 +1,10 @@
 package me.theminebench.exgame;
 
-import me.theminebench.exgame.game.lobbygame.LobbyGameManager;
-import me.theminebench.exgame.game.lobbygame.LobbyGameFactory;
-import me.theminebench.exgame.game.lobbygame.game.LobbyGame;
-import me.theminebench.exgame.game.lobbygame.game.sg.SGgame;
-import me.theminebench.exgame.game.lobbygame.game.spleef.SpleefGame;
-import me.theminebench.exgame.game.lobbygame.game.testgame.TestGame;
+import me.theminebench.exgame.game.eventgame.EventGameManager;
+import me.theminebench.exgame.game.eventgame.game.lobbygame.LobbyGameFactory;
+import me.theminebench.exgame.game.eventgame.game.lobbygame.LobbyGameManager;
+import me.theminebench.exgame.game.eventgame.game.lobbygame.game.LobbyGame;
+import me.theminebench.exgame.game.eventgame.game.lobbygame.game.spleef.SpleefGame;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -14,6 +13,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
+
 
 public class ExGame extends JavaPlugin implements Listener {
 	
@@ -41,14 +41,13 @@ public class ExGame extends JavaPlugin implements Listener {
 	public void onEnable() {
 		setPlugin(this);
 		
-		this.arena = new Arena(new LobbyGameManager(new LobbyGameFactory() {
+		this.arena = new Arena(new EventGameManager(new LobbyGameManager(new LobbyGameFactory() {
 			
 			@Override
-			public LobbyGame getLobbyGame() {
+			public LobbyGame getLobbyGame(LobbyGameManager lobbyGameManager) {
 				return new SpleefGame();
 			}
-			
-		}));
+		})));
 		Bukkit.getPluginManager().registerEvents(this, this);
 	}
 

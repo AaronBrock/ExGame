@@ -7,13 +7,13 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemStack;
 
+import me.theminebench.exgame.game.eventgame.game.lobbygame.listeners.spectate.GameModeSpectateManager;
 import me.theminebench.exgame.game.lobbygame.LobbyGameManager.GameState;
 import me.theminebench.exgame.game.lobbygame.game.LobbyGame;
 import me.theminebench.exgame.game.lobbygame.game.sg.templates.weight.WeightItemDataManager;
 import me.theminebench.exgame.game.lobbygame.game.sg.templates.weight.WeightPlayerDataManager;
 import me.theminebench.exgame.game.lobbygame.templates.LobbyGameTemplate;
 import me.theminebench.exgame.game.lobbygame.templates.spectate.SpectateListener;
-import me.theminebench.exgame.game.lobbygame.templates.spectate.SpectateManager;
 import me.theminebench.exgame.utils.ItemStackUtil;
 
 public class SGDataManager implements LobbyGameTemplate, WeightPlayerDataManager, WeightItemDataManager, SpectateListener {
@@ -24,15 +24,15 @@ public class SGDataManager implements LobbyGameTemplate, WeightPlayerDataManager
 	
 	private LobbyGame lobbyGame;
 	
-	private SpectateManager sm;
+	private GameModeSpectateManager sm;
 	
-	public SGDataManager(LobbyGame lobbyGame, SpectateManager sm) {
+	public SGDataManager(LobbyGame lobbyGame, GameModeSpectateManager sm) {
 		this.sm = sm;
 		this.lobbyGame = lobbyGame;
 		getSpectateManager().registerListener(this);
 	}
 	
-	public SpectateManager getSpectateManager() {
+	public GameModeSpectateManager getSpectateManager() {
 		return this.sm;
 	}
 	

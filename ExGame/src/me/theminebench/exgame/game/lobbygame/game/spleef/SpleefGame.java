@@ -2,25 +2,25 @@ package me.theminebench.exgame.game.lobbygame.game.spleef;
 
 import java.util.UUID;
 
+import me.theminebench.exgame.game.eventgame.game.lobbygame.listeners.defaults.countdowns.LobbyCountdown;
+import me.theminebench.exgame.game.eventgame.game.lobbygame.listeners.defaults.countdowns.PostGameCountdown;
+import me.theminebench.exgame.game.eventgame.game.lobbygame.listeners.defaults.countdowns.PreGameCountdown;
+import me.theminebench.exgame.game.eventgame.game.lobbygame.listeners.defaults.gamestatelisteners.DefaultLobbyTemplate;
+import me.theminebench.exgame.game.eventgame.game.lobbygame.listeners.defaults.gamestatelisteners.DefaultPostGameTemplate;
+import me.theminebench.exgame.game.eventgame.game.lobbygame.listeners.defaults.gamestatelisteners.DefaultPreGameTemplate;
+import me.theminebench.exgame.game.eventgame.game.lobbygame.listeners.spawn.DefaultSpawnTemplate;
+import me.theminebench.exgame.game.eventgame.game.lobbygame.listeners.spectate.PlayerEnableSpectateEvent;
+import me.theminebench.exgame.game.eventgame.game.lobbygame.listeners.spectate.GameModeSpectateManager;
 import me.theminebench.exgame.game.lobbygame.LobbyGameManager;
 import me.theminebench.exgame.game.lobbygame.LobbyGameManager.GameState;
 import me.theminebench.exgame.game.lobbygame.events.LobbyEventHandler;
 import me.theminebench.exgame.game.lobbygame.game.LobbyGame;
 import me.theminebench.exgame.game.lobbygame.templates.LobbyGameTemplate;
-import me.theminebench.exgame.game.lobbygame.templates.countdowns.LobbyCountdown;
-import me.theminebench.exgame.game.lobbygame.templates.countdowns.PostGameCountdown;
-import me.theminebench.exgame.game.lobbygame.templates.countdowns.PreGameCountdown;
-import me.theminebench.exgame.game.lobbygame.templates.gamedefaults.DefaultLobbyTemplate;
-import me.theminebench.exgame.game.lobbygame.templates.gamedefaults.DefaultPostGameTemplate;
-import me.theminebench.exgame.game.lobbygame.templates.gamedefaults.DefaultPreGameTemplate;
-import me.theminebench.exgame.game.lobbygame.templates.spawn.DefaultSpawnTemplate;
-import me.theminebench.exgame.game.lobbygame.templates.spectate.PlayerEnableSpectateEvent;
-import me.theminebench.exgame.game.lobbygame.templates.spectate.SpectateManager;
 import me.theminebench.exgame.game.lobbygame.templates.worldcreation.WorldCreationTemplate;
 
 public class SpleefGame implements LobbyGame, LobbyGameTemplate {
 	
-	private SpectateManager spectateManager;
+	private GameModeSpectateManager spectateManager;
 	
 	private SpleefTemplate spleefTemplate;
 	
@@ -41,7 +41,7 @@ public class SpleefGame implements LobbyGame, LobbyGameTemplate {
 	@Override
 	public LobbyGameTemplate[] getTemplates() {
 		getLobbyGameManager().registerLobbyListener(this);
-		spectateManager = new SpectateManager(this);
+		spectateManager = new GameModeSpectateManager(this);
 		
 		spleefTemplate = new SpleefTemplate(this, spectateManager);
 		
@@ -58,7 +58,8 @@ public class SpleefGame implements LobbyGame, LobbyGameTemplate {
 				defaultSpawnTemplate,
 				new DefaultLobbyTemplate(this),
 				new DefaultPreGameTemplate(this),
-				new DefaultPostGameTemplate(this)};
+				new DefaultPostGameTemplate(this)
+				};
 	}
 
 	@Override
@@ -74,7 +75,7 @@ public class SpleefGame implements LobbyGame, LobbyGameTemplate {
 	}
 	
 	public void checkGameEnd() {
-		if (spectateManager.getPlayers().size() <= 1) {
+		if (spectateManager.getPlayers().size() <= 1 && getLobbyGameManager().getGameState().equals(GameState.IN_GAME)) {
 			getLobbyGameManager().setGameState(GameState.POST_GAME);
 		}
 	}

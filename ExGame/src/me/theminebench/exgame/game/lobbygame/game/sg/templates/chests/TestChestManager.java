@@ -2,7 +2,7 @@ package me.theminebench.exgame.game.lobbygame.game.sg.templates.chests;
 		
 import java.util.UUID;
 
-import me.theminebench.exgame.game.lobbygame.templates.spectate.SpectateManager;
+import me.theminebench.exgame.game.eventgame.game.lobbygame.listeners.spectate.GameModeSpectateManager;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -13,9 +13,9 @@ import org.bukkit.inventory.ItemStack;
 		
 public class TestChestManager implements ChestsManager {
 		
-	private SpectateManager sm;
+	private GameModeSpectateManager sm;
 		
-	public TestChestManager(SpectateManager sm) {
+	public TestChestManager(GameModeSpectateManager sm) {
 		this.sm = sm;
 	}	
 	

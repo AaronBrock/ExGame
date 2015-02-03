@@ -54,6 +54,7 @@ public class WorldUtil {
 
 			if (!file.exists()) {
 				System.out.print("Could not find file at: " + file.getPath() + "  Something can't be deleted if its not there.");
+				runAfter.run();
 				return;
 			}
 			try {
@@ -63,7 +64,7 @@ public class WorldUtil {
 				return;
 			}
 			System.out.print("Deleted the files found at: " + file.getPath() + "  though.");
-
+			runAfter.run();
 			return;
 
 		} else {
@@ -87,7 +88,7 @@ public class WorldUtil {
 					if (runAfter != null)
 						runAfter.run();
 					return;
-				} catch (IOException e) {
+				} catch (Exception e) {
 					System.out.print("COULD NOT DELETE " + mapName + "!");
 					e.printStackTrace();
 				}

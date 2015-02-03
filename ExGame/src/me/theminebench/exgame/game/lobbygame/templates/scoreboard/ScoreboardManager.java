@@ -3,40 +3,68 @@ package me.theminebench.exgame.game.lobbygame.templates.scoreboard;
 import java.util.HashMap;
 import java.util.UUID;
 
-import org.bukkit.Bukkit;
-import org.bukkit.scoreboard.Scoreboard;
-
-import me.theminebench.exgame.game.lobbygame.LobbyGameManager.GameState;
+import me.theminebench.exgame.game.lobbygame.game.LobbyGame;
 import me.theminebench.exgame.game.lobbygame.templates.LobbyGameTemplate;
+
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 public class ScoreboardManager implements LobbyGameTemplate {
 
-	private HashMap<UUID, Scoreboard> playerScoreboards = new HashMap<UUID, Scoreboard>();
+	private HashMap<UUID, ScoreboardData> playerScoreboards = new HashMap<UUID, ScoreboardData>();
 	
-	private Scoreboard globalScoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
+	private ScoreboardData globalScoreboard = new ScoreboardData();
 	
-	
-	@Override
-	public void gameStateChange(GameState oldGameState, GameState newGameState) {
-		
-		
+	public ScoreboardManager(LobbyGame lobbyGame) {
 		
 	}
 	
-	
-	
-	
-	
-	@Override
-	public boolean canJoin(UUID playersUUID) {
-		
-		return true;
+	public ScoreboardData checkScoreboard(UUID playersUUID) {
+		if (playerScoreboards.get(playersUUID) == null) {
+			playerScoreboards.put(playersUUID, new ScoreboardData());
+		}
+		return playerScoreboards.get(playersUUID);
 	}
-
-	@Override
-	public void playerJoin(UUID playersUUID) {}
-
-	@Override
-	public void playerQuit(UUID playersUUID) {}
-
+	
+	public void setScore(UUID playersUUID, String id, String scoreName, int scoreNumber) {
+		ScoreboardData sd = checkScoreboard(playersUUID);
+		sd.setScore(id, scoreName, scoreNumber);
+	}
+	
+	public void removePlayerScoreboard(UUID playersUUID) {
+		
+		if (playerScoreboards.get(playersUUID) == null)
+			return;
+		Player p = Bukkit.getPlayer(playersUUID);
+		
+		if (p.getScoreboard() == playerScoreboards.get(playersUUID).getScoreboard()) {
+			setScoreboard(playersUUID, ScoreboardType.NO_SCOREBOARD);
+		}
+		
+		playerScoreboards.remove(playersUUID);
+	}
+	
+	
+	public void setScoreboard(UUID playersUUID, ScoreboardType st) {
+		Player p = Bukkit.getPlayer(playersUUID);
+		
+		switch (st) {
+		case ARENA_SCOREBOARD:
+			p.setScoreboard(globalScoreboard.getScoreboard());
+			return;
+		case NO_SCOREBOARD:
+			p.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
+			return;
+		case PLAYER_SCOREBOARD:
+			p.setScoreboard(checkScoreboard(playersUUID).getScoreboard());
+			return;
+		}
+	}
+	
+	
+	public enum ScoreboardType {
+		PLAYER_SCOREBOARD,
+		ARENA_SCOREBOARD,
+		NO_SCOREBOARD;
+	}
 }

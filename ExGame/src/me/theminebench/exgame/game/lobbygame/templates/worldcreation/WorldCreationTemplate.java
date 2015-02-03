@@ -1,24 +1,22 @@
 package me.theminebench.exgame.game.lobbygame.templates.worldcreation;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import me.theminebench.exgame.game.eventgame.game.lobbygame.events.GameStateChangeEvent;
 import me.theminebench.exgame.game.lobbygame.LobbyGameManager.GameState;
 import me.theminebench.exgame.game.lobbygame.events.LobbyEventHandler;
 import me.theminebench.exgame.game.lobbygame.events.LobbyEventPriority;
-import me.theminebench.exgame.game.lobbygame.events.defaultEvents.GameStateChangeEvent;
 import me.theminebench.exgame.game.lobbygame.game.LobbyGame;
-import me.theminebench.exgame.game.lobbygame.templates.LobbyGameTemplate;
 import me.theminebench.exgame.utils.ServerUtil;
 import me.theminebench.exgame.utils.WorldUtil;
 
 import org.bukkit.World;
 import org.bukkit.configuration.file.YamlConfiguration;
 
-public class WorldCreationTemplate implements LobbyGameTemplate, WorldMannager {
+public class WorldCreationTemplate implements WorldManager {
 	
 	private String worldName = "Game";
 	private LobbyGame lobbyGame;
@@ -30,39 +28,30 @@ public class WorldCreationTemplate implements LobbyGameTemplate, WorldMannager {
 		if (saveFile == null)
 			ServerUtil.shutdown("Scotty beamed you up cause there wern't no world!", "Could not find a world for the game " + lobbyGame.getName());
 		
-		getLobbyGame().getLobbyGameManager().registerLobbyListener(this);
+		getLobbyGame().getLobbyGameManager().getLobbyEventManager().registerLobbyListener(this);
 	}
 	
 	
-	@LobbyEventHandler(priority=LobbyEventPriority.LOWEST)
+	@LobbyEventHandler(priority=LobbyEventPriority.HIGHEST)
 	public void gameStateChange(GameStateChangeEvent e) {
+		
 		if (e.getCurrentGameState().equals(GameState.IN_LOBBY)) {
-			if (WorldUtil.isWorldLoaded(worldName)) {
-				WorldUtil.deleteWorld(worldName, new Runnable() {
-					@Override
-					public void run() {
-						createWorld();
-					}
-				});
-			} else {
-				if (WorldUtil.hasWorldFile(worldName)) {
-					try {
-						WorldUtil.deleteFile(WorldUtil.getWorldFile(worldName));
-					} catch (IOException e1) {
-						e1.printStackTrace();
-					}
+			WorldUtil.deleteWorld(worldName, new Runnable() {
+				@Override
+				public void run() {
+					createWorld();
 				}
-				createWorld();
-			}
+			});
+
 		} else if (e.getCurrentGameState().equals(GameState.RESTARTING)) {
-			getLobbyGame().getLobbyGameManager().unregisterLobbyListener(this);
+			getLobbyGame().getLobbyGameManager().getLobbyEventManager().unregisterLobbyListener(this);
 		}
 	}
 	
 	private void createWorld() {
-		World world = WorldUtil.createWorld(getSaveFile(), getWorldName());
+		WorldUtil.createWorld(getSaveFile(), getWorldName());
 		
-		getLobbyGame().getLobbyGameManager().fireEvent(new WorldCreateEvent(world, getMapData(), this));
+		getLobbyGame().getLobbyGameManager().getLobbyEventManager().fireEvent(this);
 	}
 	
 	private File getWorldFile() {

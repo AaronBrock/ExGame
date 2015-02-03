@@ -26,7 +26,6 @@ public class Arena implements Listener {
 	}
 	
 	public boolean removePlayer(UUID playersUUID) {
-		
 		if (getGame() == null) return false;
 		
 		if (!players.contains(playersUUID)) return false;

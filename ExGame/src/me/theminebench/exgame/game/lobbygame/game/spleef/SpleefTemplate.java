@@ -3,13 +3,10 @@ package me.theminebench.exgame.game.lobbygame.game.spleef;
 import java.util.UUID;
 
 import me.theminebench.exgame.ExGame;
+import me.theminebench.exgame.game.eventgame.events.PlayerQuitArenaEvent;
+import me.theminebench.exgame.game.eventgame.game.lobbygame.events.GameStateChangeEvent;
+import me.theminebench.exgame.game.eventgame.game.lobbygame.listeners.spectate.GameModeSpectateManager;
 import me.theminebench.exgame.game.lobbygame.LobbyGameManager.GameState;
-import me.theminebench.exgame.game.lobbygame.events.LobbyEventHandler;
-import me.theminebench.exgame.game.lobbygame.events.defaultEvents.GameStateChangeEvent;
-import me.theminebench.exgame.game.lobbygame.events.defaultEvents.PlayerQuitArenaEvent;
-import me.theminebench.exgame.game.lobbygame.templates.LobbyGameTemplate;
-import me.theminebench.exgame.game.lobbygame.templates.spectate.SpectateManager;
-import me.theminebench.exgame.game.lobbygame.templates.worldcreation.WorldCreateEvent;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
@@ -36,21 +33,21 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.util.Vector;
 
-public class SpleefTemplate implements LobbyGameTemplate {
+public class SpleefTemplate {
 	
 	private SpleefGame spleefGame;
 	
-	private SpectateManager spectateManager;
+	private GameModeSpectateManager spectateManager;
 	
 	private World gameWorld;
 	
-	public SpleefTemplate(SpleefGame spleefGame, SpectateManager spectateManager) {
+	public SpleefTemplate(SpleefGame spleefGame, GameModeSpectateManager spectateManager) {
 		this.spleefGame = spleefGame;
 		this.spectateManager = spectateManager;
 		spleefGame.getLobbyGameManager().registerLobbyListener(this);
 	}
 	
-	public SpectateManager getSpectateManager() {
+	public GameModeSpectateManager getSpectateManager() {
 		return this.spectateManager;
 	}
 	

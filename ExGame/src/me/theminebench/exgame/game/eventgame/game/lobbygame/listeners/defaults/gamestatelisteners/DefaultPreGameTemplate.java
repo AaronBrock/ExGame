@@ -1,19 +1,22 @@
-package me.theminebench.exgame.game.lobbygame.templates.gamedefaults;
+package me.theminebench.exgame.game.eventgame.game.lobbygame.listeners.defaults.gamestatelisteners;
 
+import java.util.List;
 import java.util.UUID;
 
 import me.theminebench.exgame.ExGame;
-import me.theminebench.exgame.game.lobbygame.LobbyGameManager.GameState;
-import me.theminebench.exgame.game.lobbygame.events.LobbyEventHandler;
-import me.theminebench.exgame.game.lobbygame.events.defaultEvents.GameStateChangeEvent;
-import me.theminebench.exgame.game.lobbygame.game.LobbyGame;
-import me.theminebench.exgame.game.lobbygame.templates.LobbyGameTemplate;
+import me.theminebench.exgame.game.eventgame.GameEventHandler;
+import me.theminebench.exgame.game.eventgame.game.lobbygame.LobbyGameManager;
+import me.theminebench.exgame.game.eventgame.game.lobbygame.LobbyGameManager.GameState;
+import me.theminebench.exgame.game.eventgame.game.lobbygame.events.GameEndEvent;
+import me.theminebench.exgame.game.eventgame.game.lobbygame.events.GameStateChangeEvent;
+import me.theminebench.exgame.game.eventgame.game.lobbygame.listeners.PlayerManager;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
@@ -21,27 +24,39 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 
-public class DefaultPreGameTemplate implements LobbyGameTemplate {
+public class DefaultPreGameTemplate implements Listener {
 	
-	private LobbyGame lobbyGame;
+	private LobbyGameManager lobbyGameManager;
 	
-	public DefaultPreGameTemplate(LobbyGame lobbyGame) {
-		this.lobbyGame = lobbyGame;
-		lobbyGame.getLobbyGameManager().registerLobbyListener(this);
+	private PlayerManager playerManager;
+	
+	
+	public DefaultPreGameTemplate(LobbyGameManager lobbyGameManager) {
+		this.lobbyGameManager = lobbyGameManager;
+		getLobbyGameManager().registerListener(this);
 	}
 	
-	@LobbyEventHandler
+	@GameEventHandler
+	public void onPlayerManager(PlayerManager e) {
+		this.playerManager = e;
+	}
+	
+	@GameEventHandler
 	public void gameStateChange(GameStateChangeEvent e) {
 
 		if (e.getCurrentGameState().equals(GameState.PRE_GAME)) {
 			Bukkit.getPluginManager().registerEvents(this, ExGame.getPlugin());
 		} else if(e.getOldGameState().equals(GameState.PRE_GAME)) {
 			HandlerList.unregisterAll(this);
-		} if (e.getCurrentGameState().equals(GameState.RESTARTING)) {
-			lobbyGame.getLobbyGameManager().unregisterLobbyListener(this);
 		}
 	}
-
+	
+	@GameEventHandler
+	public void onEnd(GameEndEvent e) {
+		getLobbyGameManager().unregisterListener(this);
+		HandlerList.unregisterAll(this);
+	}
+	
 	@EventHandler
 	public void onEntityDamage(EntityDamageEvent e) {
 		Entity entity = e.getEntity();
@@ -91,9 +106,21 @@ public class DefaultPreGameTemplate implements LobbyGameTemplate {
 	}
 	
 	private boolean hasPlayer(UUID u) {
-		return lobbyGame.getLobbyGameManager().getArena().getPlayers().contains(u);
+		return getPlayers().contains(u);
+	}
+	
+	private List<UUID> getPlayers() {
+		if (playerManager == null)
+			return getLobbyGameManager().getPlayers();
+		else
+			return playerManager.getPlayers();
 	}
 	
 	
+	
+	
+	public LobbyGameManager getLobbyGameManager() {
+		return lobbyGameManager;
+	}
 	
 }

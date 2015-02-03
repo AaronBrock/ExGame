@@ -29,6 +29,9 @@ public class Updater implements Runnable {
 	}
 	
 	public void registerListener(UpdateListener updateListener, long... ticks) {
+		
+		System.out.print("registering " + updateListener.getClass().getName());
+		
 		if (ticks.length != 0)
 			listeners.put(updateListener, new UpdaterData(tickCounter, ticks));
 		else {
@@ -36,8 +39,10 @@ public class Updater implements Runnable {
 		}
 	}
 
-	public void unregisterListener(UpdateListener updateReader) {
-		listeners.remove(updateReader);
+	public void unregisterListener(UpdateListener updateListener) {
+		System.out.print("unregistering " + updateListener.getClass().getName());
+		
+		listeners.remove(updateListener);
 	}
 	
 	@Override
