@@ -3,8 +3,6 @@ package me.theminebench.exgame.game.eventgame.game.lobbygame.listeners.defaults.
 import java.util.List;
 import java.util.UUID;
 
-import me.theminebench.exgame.UpdateListener;
-import me.theminebench.exgame.Updater;
 import me.theminebench.exgame.game.eventgame.GameEventHandler;
 import me.theminebench.exgame.game.eventgame.events.PlayerCanJoinArenaEvent;
 import me.theminebench.exgame.game.eventgame.events.PlayerJoinArenaEvent;
@@ -13,6 +11,8 @@ import me.theminebench.exgame.game.eventgame.game.lobbygame.LobbyGameManager;
 import me.theminebench.exgame.game.eventgame.game.lobbygame.LobbyGameManager.GameState;
 import me.theminebench.exgame.game.eventgame.game.lobbygame.events.GameStateChangeEvent;
 import me.theminebench.exgame.game.eventgame.game.lobbygame.listeners.PlayerManager;
+import me.theminebench.exgame.updater.UpdateListener;
+import me.theminebench.exgame.updater.Updater;
 
 
 

@@ -1,12 +1,12 @@
 package me.theminebench.exgame.game.eventgame.game.lobbygame.listeners.defaults.countdowns;
 
-import me.theminebench.exgame.UpdateListener;
-import me.theminebench.exgame.Updater;
 import me.theminebench.exgame.game.eventgame.GameEventHandler;
 import me.theminebench.exgame.game.eventgame.game.lobbygame.LobbyGameManager;
 import me.theminebench.exgame.game.eventgame.game.lobbygame.LobbyGameManager.GameState;
 import me.theminebench.exgame.game.eventgame.game.lobbygame.events.GameEndEvent;
 import me.theminebench.exgame.game.eventgame.game.lobbygame.events.GameStateChangeEvent;
+import me.theminebench.exgame.updater.UpdateListener;
+import me.theminebench.exgame.updater.Updater;
 
 public class PreGameCountdown implements UpdateListener {
 	

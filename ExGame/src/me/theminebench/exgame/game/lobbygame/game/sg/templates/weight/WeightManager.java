@@ -2,23 +2,20 @@ package me.theminebench.exgame.game.lobbygame.game.sg.templates.weight;
 
 import java.util.UUID;
 
-import me.theminebench.exgame.ExGame;
-import me.theminebench.exgame.game.lobbygame.LobbyGameManager.GameState;
 import me.theminebench.exgame.game.lobbygame.game.LobbyGame;
 import me.theminebench.exgame.game.lobbygame.game.sg.templates.weight.weightlisteners.WeightListeners;
-import me.theminebench.exgame.game.lobbygame.templates.LobbyGameTemplate;
+import me.theminebench.exgame.updater.UpdateListener;
+import me.theminebench.exgame.updater.Updater;
 import me.theminebench.exgame.utils.ItemStackUtil;
 import me.theminebench.exgame.utils.NumberUtil;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.scheduler.BukkitRunnable;
 
-public class WeightManager implements LobbyGameTemplate{
+public class WeightManager {
 	private WeightListeners weightListeners;
 	private LobbyGame lobbyGame;
 	private WeightPlayerDataManager pdm;
@@ -59,17 +56,6 @@ public class WeightManager implements LobbyGameTemplate{
 		getPlayerDataManager().setPlayerWeight(u, counter);
 	}
 	public void updateWeightLater(final UUID u) {
-		
-		new BukkitRunnable() {
-			
-			@Override
-			public void run() {
-				updateWeight(u);
-				
-			}
-		}.runTaskLater(ExGame.getPlugin(), 1);
-		
-		/*
 		Bukkit.broadcastMessage(Bukkit.getPlayer(u).getName());
 		Updater.instance().registerListener(new UpdateListener() {
 			@Override
@@ -79,7 +65,6 @@ public class WeightManager implements LobbyGameTemplate{
 				
 			}
 		}, 1);
-		*/
 	}
 	public int itemsAllowedUsingAmount(UUID u, ItemStack itemStack) {
 		return NumberUtil.lower(itemStack.getAmount(), itemsAllowed(u, itemStack));
@@ -113,32 +98,5 @@ public class WeightManager implements LobbyGameTemplate{
 		return weightListeners;
 	}
 	
-	@Override
-	public void gameStateChange(GameState oldGameState, GameState newGameState) {
-		if (newGameState.equals(GameState.IN_GAME)) {
-			for (UUID u : lobbyGame.getLobbyGameManager().getArena().getPlayers())
-				updateWeight(u);
-			Bukkit.getPluginManager().registerEvents(getWeightListeners(), ExGame.getPlugin());
-		} else
-			if (oldGameState.equals(GameState.IN_GAME)) {
-				HandlerList.unregisterAll(getWeightListeners());
-			}
-		
-	}
-	@Override
-	public boolean canJoin(UUID playersUUID) {
-		// TODO Auto-generated method stub
-		return true;
-	}
-	@Override
-	public void playerJoin(UUID playersUUID) {
-		// TODO Auto-generated method stub
-		
-	}
-	@Override
-	public void playerQuit(UUID playersUUID) {
-		// TODO Auto-generated method stub
-		
-	}
 }
 
